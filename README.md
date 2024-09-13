@@ -71,5 +71,6 @@ This overview provides the necessary information to set up and understand the au
 
 ---
 
-Image of Generating API keys for `~/.oci/config` file
+**Image of Generating API keys for `~/.oci/config` file**
+
 ![image](https://github.com/user-attachments/assets/0e11183f-1109-4e06-aa56-8e6175a63ecc)
