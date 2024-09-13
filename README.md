@@ -61,13 +61,23 @@ To securely upload backups to a private bucket in Oracle Cloud, you need to conf
 
 ## Restoration Process
 
-1. **Download and Extract**: Downloads a specified backup file from the Oracle Cloud bucket using the OCI CLI and extracts it to a local directory.
+1. **Download and Extract**: The restoration script downloads a specified backup file from the Oracle Cloud bucket using the OCI CLI and extracts it to a local directory.
 
-2. **Restore Databases**: Scans the extracted folders to find the latest SQL files for each database and restores them using the MySQL command-line tool. The script logs success or failure messages for each database restoration.
+   - **User Prompt**: Every time you run the restore script, it will prompt you to enter the object file name to download from the bucket:
 
----
+     ```bash
+     Enter the object file name to download from the bucket:
+     ```
 
-This overview provides the necessary information to set up and understand the automation process for backing up and restoring MySQL databases using Oracle Cloud Object Storage.
+     - **Example**: If your backup file is named `latest_database_backup_2024-09-13__11_hour-33_min.tar`, you would enter:
+
+       ```
+       latest_database_backup_2024-09-13__11_hour-33_min.tar
+       ```
+
+     - **Note**: Ensure you have the correct backup file name, which can be obtained from your Oracle Cloud bucket or from your upload script logs.
+
+2. **Restore Databases**: The script scans the extracted folders to find the latest SQL files for each database and restores them using the MySQL command-line tool. The script logs success or failure messages for each database restoration.
 
 ---
 
