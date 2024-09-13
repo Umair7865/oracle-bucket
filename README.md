@@ -1,4 +1,4 @@
-# oracle-bucket
+# Upload and Restore MySQL Database from Oracle Bucket
 upload database to oracle bucket using "~/.oci/config" file which we can get from oracle user 
 
 1. Create API Keys and save the private key to upload data into bucket privately
