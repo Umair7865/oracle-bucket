@@ -14,7 +14,6 @@ Automate your database backup, upload, download, restoration, and cleanup proces
   - [delete-all-object-except-latest.sh](#delete-all-object-except-latestsh)
 - [Usage](#usage)
 - [Contributing](#contributing)
-- [License](#license)
 
 ## Features
 
