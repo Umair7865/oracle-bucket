@@ -5,7 +5,7 @@
 
 BUCKET_NAME="<enter name of bucket>"                                                    # Replace with your bucket name
 OBJECT_NAME="latest_database_backup_$(date +\%F__\%H_hour-\%M_min).tar"                 # Name to use when storing the object in the bucket
-FILE_PATH="/home/opc/opc/seperate-mysql-db-bk/backup_tar/backup_mysql.tar.gz"           # Path to the file on your local system
+FILE_PATH="$HOME/backup-in-tar/backup_mysql.tar.gz"           # Path to the file on your local system
 
 # Upload the file
 oci os object put --bucket-name $BUCKET_NAME --name $OBJECT_NAME --file $FILE_PATH
