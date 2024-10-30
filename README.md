@@ -52,7 +52,7 @@ Before using these scripts, ensure you have the following:
 
 Automates the backup process by archiving database dumps into tar files.
 
-#### Usage
+#### Configuration
 
 1. **Provide Source Directory Path**
 
