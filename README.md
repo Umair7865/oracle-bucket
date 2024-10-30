@@ -13,7 +13,6 @@ Automate your database backup, download, restoration, and cleanup processes with
   - [delete-all-object-except-latest.sh](#delete-all-object-except-latestsh)
 - [Usage](#usage)
 - [Contributing](#contributing)
-- [License](#license)
 
 ## Features
 
@@ -70,14 +69,9 @@ Automates the backup process by archiving database dumps into tar files.
 2. **Run the Script**
 
    ```bash
-   ./backup-in-tar.sh /path/to/backups/
+   ./backup-in-tar.sh 
    ```
 
-#### Example
-
-```bash
-./backup-in-tar.sh /home/user/database_backups/
-```
 
 ### `download_and_restore.sh`
 
@@ -128,6 +122,8 @@ MYSQL_PASSWORD="root123"  # Replace with your MySQL password
    - **Iterate Through Directories**: The script goes through each folder in the extraction path. Each folder should represent a separate database.
    
    - **Identify SQL Files**: Inside each database folder, the script looks for a file named `dump.sql`. This file contains the SQL commands needed to restore the database.
+
+   - **Check for Latest Dump**: Additionally, the script identifies the most recent `dump.sql` file within each database folder and restores that latest dump to ensure the most up-to-date data is used.
    
    - **Restore Process**: Using the MySQL command-line tool, the script imports the `dump.sql` file into the corresponding database. If the restoration is successful, you will see a message like:
      
