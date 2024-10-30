@@ -2,11 +2,23 @@
 
 # Variables
 NAMESPACE=$(oci os ns get --query 'data' --raw-output)
-BUCKET_NAME="Database-Backup"  # Replace with your bucket name
-LOCAL_DOWNLOAD_PATH="/home/opc/opc/downloads"  # Directory where the tar file will be downloaded
-EXTRACT_PATH="/home/opc/opc/downloads"  # Directory where the tar file will be extracted
+BUCKET_NAME="<Bucket-Name-Here>"  # Replace with your bucket name
+LOCAL_DOWNLOAD_PATH="$HOME/downloads"  # Directory where the tar file will be downloaded
+EXTRACT_PATH="$HOME/downloads"  # Directory where the tar file will be extracted
 MYSQL_USER="root"  # Replace with your MySQL username
 MYSQL_PASSWORD="root123"  # Replace with your MySQL password
+
+# making downloads directory if not exist 
+DOWNLOAD_DIR="$HOME/download"
+
+# Check if the directory exists
+if [ ! -d "$DOWNLOAD_DIR" ]; then
+    # If not, create the directory
+    mkdir "$DOWNLOAD_DIR"
+    echo "Directory 'download' created at $HOME"
+else
+    echo "Directory 'download' already exists at $HOME"
+fi
 
 # Prompt for the object file name
 read -p "Enter the object file name to download from the bucket: " OBJECT_NAME
