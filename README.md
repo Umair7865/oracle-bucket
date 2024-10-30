@@ -27,7 +27,7 @@ Automate your database backup, upload, download, restoration, and cleanup proces
 Before using these scripts, ensure you have the following:
 
 - **Operating System**: Unix-based (Linux, macOS)
-- **OCI CLI**: Installed and configured. [OCI CLI Installation Guide](https://docs.oracle.com/en-us/iaas/Content/SDKTools/oci-cli-install.htm)
+- **OCI CLI**: Installed and configured. [OCI CLI Installation Guide](https://docs.oracle.com/en-us/iaas/Content/API/SDKDocs/cliinstall.htm#InstallingCLI__linux_and_unix)
 - **MySQL**: Installed and configured.
 - **Basic Shell Knowledge**: Familiarity with running shell scripts.
 
