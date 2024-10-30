@@ -1,6 +1,6 @@
 # Backup and Restore Automation Scripts
 
-Automate your database backup, download, restoration, and cleanup processes with these shell scripts. Designed for ease of use and efficiency, these scripts help manage your backups stored in Oracle Cloud Infrastructure (OCI) Object Storage.
+Automate your database backup, upload, download, restoration, and cleanup processes with these shell scripts. Designed for ease of use and efficiency, these scripts help manage your backups stored in Oracle Cloud Infrastructure (OCI) Object Storage.
 
 ## Table of Contents
 
@@ -9,14 +9,17 @@ Automate your database backup, download, restoration, and cleanup processes with
 - [Installation](#installation)
 - [Scripts](#scripts)
   - [backup-in-tar.sh](#backup-in-tarsh)
+  - [upload_to_bucket.sh](#upload_to_bucketsh)
   - [download_and_restore.sh](#download_and_restoresh)
   - [delete-all-object-except-latest.sh](#delete-all-object-except-latestsh)
 - [Usage](#usage)
 - [Contributing](#contributing)
+- [License](#license)
 
 ## Features
 
 - **Backup Automation**: Create tar archives of your database backups.
+- **Upload to OCI Bucket**: Upload tar files to OCI Object Storage for secure and centralized storage.
 - **Download & Restore**: Download tar files from OCI Object Storage, extract them, and restore databases.
 - **Cleanup**: Automatically delete older backups, retaining only the latest one.
 
@@ -41,7 +44,7 @@ Before using these scripts, ensure you have the following:
 2. **Make Scripts Executable**
 
    ```bash
-   chmod +x backup-in-tar.sh download_and_restore.sh delete-all-object-except-latest.sh
+   chmod +x backup-in-tar.sh upload_to_bucket.sh download_and_restore.sh delete-all-object-except-latest.sh
    ```
 
 ## Scripts
@@ -69,9 +72,63 @@ Automates the backup process by archiving database dumps into tar files.
 2. **Run the Script**
 
    ```bash
-   ./backup-in-tar.sh 
+   ./backup-in-tar.sh /path/to/backups/
    ```
 
+#### Example
+
+```bash
+./backup-in-tar.sh /home/user/database_backups/
+```
+
+### `upload_to_bucket.sh`
+
+Uploads the created tar files to your specified OCI Object Storage bucket, ensuring your backups are securely stored in the cloud.
+
+#### Configuration
+
+Before running the script, set the required variables inside the script:
+
+```bash
+# Variables
+NAMESPACE="<Namespace-Name-Here>"  # Replace with your actual namespace
+BUCKET_NAME="<Bucket-Name-Here>"    # Replace with your OCI bucket name
+LOCAL_TAR_PATH="/path/to/tar/files" # Directory where the tar files are located
+```
+
+#### Script Functionality
+
+1. **Verify Local Tar Directory**
+
+   The script checks if the specified local directory containing the tar files exists. If not, it notifies the user and exits.
+
+2. **List Tar Files**
+
+   It lists all `.tar` files in the specified local directory, preparing them for upload.
+
+3. **Upload Tar Files to OCI Bucket**
+
+   The script uploads each tar file to the specified OCI bucket using the OCI CLI. After successful upload, it provides a confirmation message.
+
+4. **Completion Message**
+
+   Once all tar files are uploaded, the script displays a message indicating the completion of the upload process.
+
+#### Example Output
+
+```
+Uploading backup_database1.tar to bucket my-oci-bucket...
+Uploaded backup_database1.tar successfully.
+Uploading backup_database2.tar to bucket my-oci-bucket...
+Uploaded backup_database2.tar successfully.
+All tar files have been uploaded to the OCI bucket.
+```
+
+#### Run the Script
+
+```bash
+./upload_to_bucket.sh
+```
 
 ### `download_and_restore.sh`
 
@@ -84,11 +141,11 @@ Before running the script, set the required variables inside the script:
 ```bash
 # Variables
 NAMESPACE=$(oci os ns get --query 'data' --raw-output)
-BUCKET_NAME="<Bucket-Name-Here>"  # Replace with your bucket name
+BUCKET_NAME="<Bucket-Name-Here>"      # Replace with your bucket name
 LOCAL_DOWNLOAD_PATH="$HOME/downloads"  # Directory where the tar file will be downloaded
-EXTRACT_PATH="$HOME/downloads"  # Directory where the tar file will be extracted
-MYSQL_USER="root"  # Replace with your MySQL username
-MYSQL_PASSWORD="root123"  # Replace with your MySQL password
+EXTRACT_PATH="$HOME/downloads"         # Directory where the tar file will be extracted
+MYSQL_USER="root"                      # Replace with your MySQL username
+MYSQL_PASSWORD="root123"               # Replace with your MySQL password
 ```
 
 #### Script Functionality
@@ -120,25 +177,25 @@ MYSQL_PASSWORD="root123"  # Replace with your MySQL password
    After extraction, the script automatically restores each database using the SQL files extracted from the tar archive. Here's how it works:
 
    - **Iterate Through Directories**: The script goes through each folder in the extraction path. Each folder should represent a separate database.
-   
+
    - **Identify SQL Files**: Inside each database folder, the script looks for a file named `dump.sql`. This file contains the SQL commands needed to restore the database.
 
    - **Check for Latest Dump**: Additionally, the script identifies the most recent `dump.sql` file within each database folder and restores that latest dump to ensure the most up-to-date data is used.
-   
+
    - **Restore Process**: Using the MySQL command-line tool, the script imports the `dump.sql` file into the corresponding database. If the restoration is successful, you will see a message like:
-     
+
      ```
      Restored database1 successfully.
      ```
-     
+
      If the `dump.sql` file is missing, it will notify you:
-     
+
      ```
      SQL file not found for database1.
      ```
-   
+
    - **Completion Message**: Once all databases have been processed, the script will display:
-     
+
      ```
      Database restore process completed.
      ```
@@ -161,7 +218,7 @@ Set the required variables inside the script:
 
 ```bash
 NAMESPACE="<Namespace-Name-HERE>"  # Replace with your actual namespace
-BUCKET_NAME="<Bucket-Name-HERE>"  # Replace with your actual bucket name
+BUCKET_NAME="<Bucket-Name-HERE>"    # Replace with your actual bucket name
 ```
 
 #### Script Functionality
@@ -177,6 +234,16 @@ BUCKET_NAME="<Bucket-Name-HERE>"  # Replace with your actual bucket name
 3. **Delete Older Objects**
 
    All objects except the latest one are deleted from the bucket. This helps in managing storage space by removing outdated backups while keeping the most recent one for recovery purposes.
+
+#### Example Output
+
+```
+Identifying the latest backup...
+Latest backup identified: backup_database2.tar
+Deleting older backups...
+Deleted backup_database1.tar
+All older backups have been deleted, retaining only the latest backup: backup_database2.tar.
+```
 
 #### Run the Script
 
@@ -196,7 +263,11 @@ BUCKET_NAME="<Bucket-Name-HERE>"  # Replace with your actual bucket name
 
 2. **Upload to OCI Bucket**
 
-   (Assuming you have a separate process or script to upload the tar files to OCI Object Storage.)
+   Use `upload_to_bucket.sh` to upload the tar files to your OCI Object Storage bucket.
+
+   ```bash
+   ./upload_to_bucket.sh
+   ```
 
 3. **Download and Restore Databases**
 
@@ -239,5 +310,10 @@ Contributions are welcome! Please open an issue or submit a pull request for any
 
 5. **Open a Pull Request**
 
+## License
+
+This project is licensed under the [MIT License](LICENSE).
 
 ---
+
+*Feel free to customize this README to better fit your project's needs.*
