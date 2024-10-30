@@ -1,86 +1,247 @@
-# MySQL Database Backup and Restoration Automation
+# Backup and Restore Automation Scripts
 
-This project automates the process of backing up MySQL databases, uploading the backups to Oracle Cloud Object Storage, and restoring them when needed. Below is an overview of how each script works and the setup required.
+Automate your database backup, download, restoration, and cleanup processes with these shell scripts. Designed for ease of use and efficiency, these scripts help manage your backups stored in Oracle Cloud Infrastructure (OCI) Object Storage.
 
-## Setup Instructions
+## Table of Contents
 
-To securely upload backups to a private bucket in Oracle Cloud, you need to configure the Oracle Cloud Infrastructure CLI and set up the necessary credentials.
+- [Features](#features)
+- [Prerequisites](#prerequisites)
+- [Installation](#installation)
+- [Scripts](#scripts)
+  - [backup-in-tar.sh](#backup-in-tarsh)
+  - [download_and_restore.sh](#download_and_restoresh)
+  - [delete-all-object-except-latest.sh](#delete-all-object-except-latestsh)
+- [Usage](#usage)
+- [Contributing](#contributing)
+- [License](#license)
 
-### 1. Configure OCI CLI with API Keys
+## Features
 
-- **Create API Keys**: Generate API keys in your Oracle Cloud account:
-  - Navigate to your user settings in the Oracle Cloud Console.
-  - Under "Resources," click on "API Keys."
-  - Click "Add API Key" and follow the prompts to generate a key pair.
-  - Download and securely save the private key; you'll need it for authentication.
+- **Backup Automation**: Create tar archives of your database backups.
+- **Download & Restore**: Download tar files from OCI Object Storage, extract them, and restore databases.
+- **Cleanup**: Automatically delete older backups, retaining only the latest one.
 
-- **Install OCI CLI**: If you haven't already, install the OCI CLI on your local machine following [Oracle's installation guide](https://docs.oracle.com/en-us/iaas/Content/API/SDKDocs/cliinstall.htm).
+## Prerequisites
 
-- **Configure OCI CLI**: Run the following command and provide the required information:
+Before using these scripts, ensure you have the following:
 
-  ```bash
-  oci setup config
-  ```
+- **Operating System**: Unix-based (Linux, macOS)
+- **OCI CLI**: Installed and configured. [OCI CLI Installation Guide](https://docs.oracle.com/en-us/iaas/Content/SDKTools/oci-cli-install.htm)
+- **MySQL**: Installed and configured.
+- **Basic Shell Knowledge**: Familiarity with running shell scripts.
 
-  - When prompted, provide your **User OCID**, **Tenancy OCID**, **Region**, and the path to your **private key**.
-  - The configuration will be saved in the `~/.oci/config` file.
+## Installation
 
-### 2. Create a Private Bucket on Oracle Cloud
+1. **Clone the Repository**
 
-- **Create Bucket**:
-  - Log in to the Oracle Cloud Console.
-  - Navigate to **Object Storage** under **Storage**.
-  - Click **Create Bucket**.
-  - Enter a name for your bucket (e.g., `Database-Backup`).
-  - Set the bucket type to **Private** to restrict public access.
-  - Click **Create**.
+   ```bash
+   git clone https://github.com/your-username/backup-restore-scripts.git
+   cd backup-restore-scripts
+   ```
 
-- **Note the Bucket Name**: Copy the exact name of the bucket; you'll need this for the upload script.
+2. **Make Scripts Executable**
 
-### 3. Update the Upload Script
+   ```bash
+   chmod +x backup-in-tar.sh download_and_restore.sh delete-all-object-except-latest.sh
+   ```
 
-- **Bucket Name**: In your upload script, replace the `BUCKET_NAME` variable with the name of your private bucket.
-  
-  ```bash
-  BUCKET_NAME="Your-Bucket-Name"
-  ```
+## Scripts
 
-- **File Path**: Ensure the `FILE_PATH` variable points to the location of your backup archive.
-  
-  ```bash
-  FILE_PATH="/path/to/your/backup_mysql.tar.gz"
-  ```
+### `backup-in-tar.sh`
 
-- **Test the Upload**: Run the upload script manually to confirm that backups are being uploaded successfully.
+Automates the backup process by archiving database dumps into tar files.
 
-## Backup and Upload Process
+#### Usage
 
-1. **Backup Script**: Creates a compressed archive (`.tar.gz` file) of MySQL database backups from a specified folder and saves it to a destination folder.
+1. **Provide Source Directory Path**
 
-2. **Upload Script**: Uses the OCI CLI and your `~/.oci/config` file to authenticate and upload the created archive to your private Oracle Cloud Object Storage bucket. The script assigns a unique name to the file, including the date and time, ensuring each backup is distinguishable.
+   Ensure you provide the complete path of the parent directory containing all database backups. Each database should have its own folder named exactly after the database.
 
-## Restoration Process
+   **Example Directory Structure:**
 
-1. **Download and Extract**: The restoration script downloads a specified backup file from the Oracle Cloud bucket using the OCI CLI and extracts it to a local directory.
+   ```
+   /path/to/backups/
+   ├── database1/
+   │   └── dump.sql
+   └── database2/
+       └── dump.sql
+   ```
 
-   - **User Prompt**: Every time you run the restore script, it will prompt you to enter the object file name to download from the bucket:
+2. **Run the Script**
 
-     ```bash
-     Enter the object file name to download from the bucket:
+   ```bash
+   ./backup-in-tar.sh /path/to/backups/
+   ```
+
+#### Example
+
+```bash
+./backup-in-tar.sh /home/user/database_backups/
+```
+
+### `download_and_restore.sh`
+
+Downloads a tar file from OCI Object Storage, extracts it, and restores the databases.
+
+#### Configuration
+
+Before running the script, set the required variables inside the script:
+
+```bash
+# Variables
+NAMESPACE=$(oci os ns get --query 'data' --raw-output)
+BUCKET_NAME="<Bucket-Name-Here>"  # Replace with your bucket name
+LOCAL_DOWNLOAD_PATH="$HOME/downloads"  # Directory where the tar file will be downloaded
+EXTRACT_PATH="$HOME/downloads"  # Directory where the tar file will be extracted
+MYSQL_USER="root"  # Replace with your MySQL username
+MYSQL_PASSWORD="root123"  # Replace with your MySQL password
+```
+
+#### Script Functionality
+
+1. **Check/Create Download Directory**
+
+   The script first checks if the download directory exists in your home directory (`$HOME`). If it doesn't exist, the script will create it. This ensures there's a designated place to store the downloaded tar files.
+
+2. **User Input for Object Name**
+
+   If the download directory already exists, the script will prompt you to enter the name of the tar file you wish to download from your OCI bucket. This allows you to specify which backup you want to restore.
+
+3. **Download and Extract**
+
+   The script downloads the specified tar file from the OCI bucket to the local download directory. Once downloaded, it extracts the contents of the tar file to the designated extraction path.
+
+   **Output Message:**
+
+   After successful extraction, you will see a message like:
+
+   ```
+   Tar file extracted successfully to /home/your-username/downloads.
+   ```
+
+   This confirms that the tar file has been successfully unpacked and the SQL files are ready for restoration.
+
+4. **Restore Databases**
+
+   After extraction, the script automatically restores each database using the SQL files extracted from the tar archive. Here's how it works:
+
+   - **Iterate Through Directories**: The script goes through each folder in the extraction path. Each folder should represent a separate database.
+   
+   - **Identify SQL Files**: Inside each database folder, the script looks for a file named `dump.sql`. This file contains the SQL commands needed to restore the database.
+   
+   - **Restore Process**: Using the MySQL command-line tool, the script imports the `dump.sql` file into the corresponding database. If the restoration is successful, you will see a message like:
+     
+     ```
+     Restored database1 successfully.
+     ```
+     
+     If the `dump.sql` file is missing, it will notify you:
+     
+     ```
+     SQL file not found for database1.
+     ```
+   
+   - **Completion Message**: Once all databases have been processed, the script will display:
+     
+     ```
+     Database restore process completed.
      ```
 
-     - **Example**: If your backup file is named `latest_database_backup_2024-09-13__11_hour-33_min.tar`, you would enter:
+   This comprehensive process ensures that all your databases are accurately restored from the latest backups.
 
-       ```
-       latest_database_backup_2024-09-13__11_hour-33_min.tar
-       ```
+#### Run the Script
 
-     - **Note**: Ensure you have the correct backup file name, which can be obtained from your Oracle Cloud bucket or from your upload script logs.
+```bash
+./download_and_restore.sh
+```
 
-2. **Restore Databases**: The script scans the extracted folders to find the latest SQL files for each database and restores them using the MySQL command-line tool. The script logs success or failure messages for each database restoration.
+### `delete-all-object-except-latest.sh`
+
+Cleans up the OCI bucket by deleting all objects except the latest one.
+
+#### Configuration
+
+Set the required variables inside the script:
+
+```bash
+NAMESPACE="<Namespace-Name-HERE>"  # Replace with your actual namespace
+BUCKET_NAME="<Bucket-Name-HERE>"  # Replace with your actual bucket name
+```
+
+#### Script Functionality
+
+1. **List Objects in Bucket**
+
+   The script retrieves a list of all objects stored in the specified OCI bucket. This allows the script to know which backups are available.
+
+2. **Identify Latest Object**
+
+   It determines which object (tar file) is the most recent based on the last modified timestamp. This ensures that the latest backup is retained.
+
+3. **Delete Older Objects**
+
+   All objects except the latest one are deleted from the bucket. This helps in managing storage space by removing outdated backups while keeping the most recent one for recovery purposes.
+
+#### Run the Script
+
+```bash
+./delete-all-object-except-latest.sh
+```
+
+## Usage
+
+1. **Backup Databases**
+
+   Use `backup-in-tar.sh` to archive your database dumps.
+
+   ```bash
+   ./backup-in-tar.sh /path/to/backups/
+   ```
+
+2. **Upload to OCI Bucket**
+
+   (Assuming you have a separate process or script to upload the tar files to OCI Object Storage.)
+
+3. **Download and Restore Databases**
+
+   Use `download_and_restore.sh` to download the latest backup and restore the databases.
+
+   ```bash
+   ./download_and_restore.sh
+   ```
+
+4. **Cleanup Old Backups**
+
+   Use `delete-all-object-except-latest.sh` to remove outdated backups from the OCI bucket.
+
+   ```bash
+   ./delete-all-object-except-latest.sh
+   ```
+
+## Contributing
+
+Contributions are welcome! Please open an issue or submit a pull request for any improvements or bug fixes.
+
+1. **Fork the Repository**
+2. **Create a Feature Branch**
+
+   ```bash
+   git checkout -b feature/YourFeature
+   ```
+
+3. **Commit Your Changes**
+
+   ```bash
+   git commit -m "Add your message"
+   ```
+
+4. **Push to the Branch**
+
+   ```bash
+   git push origin feature/YourFeature
+   ```
+
+5. **Open a Pull Request**
+
 
 ---
-
-**Image of Generating API keys for `~/.oci/config` file**
-
-![image](https://github.com/user-attachments/assets/0e11183f-1109-4e06-aa56-8e6175a63ecc)
