@@ -11,7 +11,7 @@
 # ============================================
 
 # User-configurable variables
-NAMESPACE="<Namespace-Name-HERE>"  # Replace with your actual namespace
+NAMESPACE=$(oci os ns get --query 'data' --raw-output)
 BUCKET_NAME="<Bucket-Name-HERE>"  # Replace with your actual bucket name
 
 
