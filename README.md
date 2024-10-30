@@ -61,7 +61,7 @@ Automates the backup process by archiving database dumps into tar files.
    **Example Directory Structure:**
 
    ```
-   /path/to/backups/
+   /path/to/backups/    # provide name 'backup' into script
    ├── database1/
    │   └── dump.sql
    └── database2/
