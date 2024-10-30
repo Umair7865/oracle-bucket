@@ -1,9 +1,9 @@
 #!/bin/bash
 
 # Define variables
-SOURCE_FOLDER="/path/of/backup/parent/directory"        # Enter the complete path of parent directory which is storing all database backup in seperate folder
-                                                        # means if there is 2 database -> create 2 folder with the EXACT name of database and store dump into 
-                                                        # relvant directory
+SOURCE_FOLDER="/path/of/backups"                  # Enter the complete path of parent directory which is storing all database backup in seperate folder
+                                                  # means if there is 2 database -> create 2 folder with the EXACT name of database and store dump into 
+                                                  # relvant directory
 ARCHIVE_NAME="backup_mysql.tar"
 DESTINATION_FOLDER="$HOME/backup-in-tar"                # DESTINATION_FOLDER="/home/opc/opc/seperate-mysql-db-bk/backup_tar"
 
