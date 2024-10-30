@@ -72,13 +72,13 @@ Automates the backup process by archiving database dumps into tar files.
 2. **Run the Script**
 
    ```bash
-   ./backup-in-tar.sh /path/to/backups/
+   ./backup-in-tar.sh 
    ```
 
 #### Example
 
 ```bash
-./backup-in-tar.sh /home/user/database_backups/
+./backup-in-tar.sh 
 ```
 
 ### `upload_to_bucket.sh`
@@ -98,31 +98,12 @@ LOCAL_TAR_PATH="/path/to/tar/files" # Directory where the tar files are located
 
 #### Script Functionality
 
-1. **Verify Local Tar Directory**
+1. **Verify Directory**: Ensures the local tar directory exists; exits if not found.
+2. **List Tar Files**: Identifies all `.tar` files in the directory.
+3. **Upload Files**: Uploads each tar file to the OCI bucket using OCI CLI, confirming each upload.
+4. **Completion Message**: Notifies once all files are successfully uploaded.
 
-   The script checks if the specified local directory containing the tar files exists. If not, it notifies the user and exits.
 
-2. **List Tar Files**
-
-   It lists all `.tar` files in the specified local directory, preparing them for upload.
-
-3. **Upload Tar Files to OCI Bucket**
-
-   The script uploads each tar file to the specified OCI bucket using the OCI CLI. After successful upload, it provides a confirmation message.
-
-4. **Completion Message**
-
-   Once all tar files are uploaded, the script displays a message indicating the completion of the upload process.
-
-#### Example Output
-
-```
-Uploading backup_database1.tar to bucket my-oci-bucket...
-Uploaded backup_database1.tar successfully.
-Uploading backup_database2.tar to bucket my-oci-bucket...
-Uploaded backup_database2.tar successfully.
-All tar files have been uploaded to the OCI bucket.
-```
 
 #### Run the Script
 
@@ -238,11 +219,11 @@ BUCKET_NAME="<Bucket-Name-HERE>"    # Replace with your actual bucket name
 #### Example Output
 
 ```
-Identifying the latest backup...
-Latest backup identified: backup_database2.tar
-Deleting older backups...
-Deleted backup_database1.tar
-All older backups have been deleted, retaining only the latest backup: backup_database2.tar.
+WARNING: This action will permanently delete old backups and keep only the latest. Are you sure you want to continue? (yes/no): yes
+Latest backup is: latest_database_backup_2024-10-30__13_hour-44_min.tar
+Deleting latest_database_backup_2024-10-30__13_hour-41_min.tar...
+Deleting latest_database_backup_2024-10-30__13_hour-43_min.tar...
+Deletion complete. Only the latest backup remains.
 ```
 
 #### Run the Script
