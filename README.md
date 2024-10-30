@@ -74,11 +74,7 @@ Automates the backup process by archiving database dumps into tar files.
    ./backup-in-tar.sh 
    ```
 
-#### Example
-
-```bash
-./backup-in-tar.sh 
-```
+---
 
 ### `upload_to_bucket.sh`
 
@@ -109,6 +105,9 @@ LOCAL_TAR_PATH="/path/to/tar/files" # Directory where the tar files are located
 ```bash
 ./upload_to_bucket.sh
 ```
+
+---
+
 
 ### `download_and_restore.sh`
 
@@ -188,6 +187,8 @@ MYSQL_PASSWORD="root123"               # Replace with your MySQL password
 ./download_and_restore.sh
 ```
 
+---
+
 ### `delete-all-object-except-latest.sh`
 
 Cleans up the OCI bucket by deleting all objects except the latest one.
@@ -231,6 +232,8 @@ Deletion complete. Only the latest backup remains.
 ./delete-all-object-except-latest.sh
 ```
 
+---
+
 ## Usage
 
 1. **Backup Databases**
@@ -264,6 +267,8 @@ Deletion complete. Only the latest backup remains.
    ```bash
    ./delete-all-object-except-latest.sh
    ```
+
+---
 
 ## Contributing
 
