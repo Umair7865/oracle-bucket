@@ -239,7 +239,7 @@ Deletion complete. Only the latest backup remains.
    Use `backup-in-tar.sh` to archive your database dumps.
 
    ```bash
-   ./backup-in-tar.sh /path/to/backups/
+   ./backup-in-tar.sh 
    ```
 
 2. **Upload to OCI Bucket**
@@ -291,10 +291,4 @@ Contributions are welcome! Please open an issue or submit a pull request for any
 
 5. **Open a Pull Request**
 
-## License
-
-This project is licensed under the [MIT License](LICENSE).
-
 ---
-
-*Feel free to customize this README to better fit your project's needs.*
