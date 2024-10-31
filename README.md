@@ -86,9 +86,7 @@ Before running the script, set the required variables inside the script:
 
 ```bash
 # Variables
-NAMESPACE="<Namespace-Name-Here>"  # Replace with your actual namespace
-BUCKET_NAME="<Bucket-Name-Here>"    # Replace with your OCI bucket name
-LOCAL_TAR_PATH="/path/to/tar/files" # Directory where the tar files are located
+BUCKET_NAME="<Bucket-Name-Here>"    # Replace with your OCI bucket name within script
 ```
 
 #### Script Functionality
@@ -119,10 +117,7 @@ Before running the script, set the required variables inside the script:
 
 ```bash
 # Variables
-NAMESPACE=$(oci os ns get --query 'data' --raw-output)
-BUCKET_NAME="<Bucket-Name-Here>"      # Replace with your bucket name
-LOCAL_DOWNLOAD_PATH="$HOME/downloads"  # Directory where the tar file will be downloaded
-EXTRACT_PATH="$HOME/downloads"         # Directory where the tar file will be extracted
+BUCKET_NAME="<Bucket-Name-Here>"       # Replace with your bucket name
 MYSQL_USER="root"                      # Replace with your MySQL username
 MYSQL_PASSWORD="root123"               # Replace with your MySQL password
 ```
