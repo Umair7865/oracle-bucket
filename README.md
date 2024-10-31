@@ -17,7 +17,7 @@ Automate your database backup, upload, download, restoration, and cleanup proces
 
 ## Features
 
-- **Backup Automation**: Create tar archives of your database backups.
+- **Backup Automation**: Create tar archives of your database backups into instance.
 - **Upload to OCI Bucket**: Upload tar files to OCI Object Storage for secure and centralized storage.
 - **Download & Restore**: Download tar files from OCI Object Storage, extract them, and restore databases.
 - **Cleanup**: Automatically delete older backups, retaining only the latest one.
