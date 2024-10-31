@@ -193,7 +193,6 @@ Cleans up the OCI bucket by deleting all objects except the latest one.
 Set the required variables inside the script:
 
 ```bash
-NAMESPACE="<Namespace-Name-HERE>"  # Replace with your actual namespace
 BUCKET_NAME="<Bucket-Name-HERE>"    # Replace with your actual bucket name
 ```
 
