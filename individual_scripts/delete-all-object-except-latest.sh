@@ -1,8 +1,5 @@
 #!/bin/bash
 
-# This script is used to delete all the objects except latest one which is in Oracle Bucket using "~/.oci/config", "~/.oci/private-key" "Bucket-Name" and "Namespace of Bucket"
-# Namespace can be found in "Bucket Detials" -> under "General"
-
 # ============================================
 # ATTENTION: This script will delete old backups
 # in the specified Object Storage bucket, keeping
@@ -11,9 +8,8 @@
 # ============================================
 
 # User-configurable variables
-NAMESPACE=$(oci os ns get --query 'data' --raw-output)
-BUCKET_NAME="<Bucket-Name-HERE>"  # Replace with your actual bucket name
-
+NAMESPACE="axor0ymlfntq"  # Replace with your actual namespace
+BUCKET_NAME="Database-Backup"  # Replace with your actual bucket name
 
 # Prompt for confirmation before proceeding
 read -p "WARNING: This action will permanently delete old backups and keep only the latest. Are you sure you want to continue? (yes/no): " confirmation
