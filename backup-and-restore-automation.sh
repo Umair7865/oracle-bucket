@@ -218,8 +218,8 @@ delete_all_except_latest() {
 # ============================================
 
 # User-configurable variables
-NAMESPACE="axor0ymlfntq"  # Replace with your actual namespace
-BUCKET_NAME="Database-Backup"  # Replace with your actual bucket name
+NAMESPACE=$(oci os ns get --query 'data' --raw-output)
+#BUCKET_NAME="Database-Backup"  # Replace with your actual bucket name
 
 # Prompt for confirmation before proceeding
 read -p "WARNING: This action will permanently delete old backups and keep only the latest. Are you sure you want to continue? (yes/no): " confirmation
