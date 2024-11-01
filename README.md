@@ -45,7 +45,8 @@ Before using these scripts, ensure you have the following:
 2. **Make Scripts Executable**
 
    ```bash
-   chmod +x backup-in-tar.sh upload-to-bucket.sh download-and-restore.sh delete-all-object-except-latest.sh backup-and-restore-automation.sh
+   chmod +x backup-and-restore-automation.sh
+   chmod +x individual_scripts/*
    ```
 
 ## Scripts
