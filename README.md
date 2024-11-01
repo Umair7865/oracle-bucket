@@ -1,7 +1,3 @@
-Here’s the complete README file with details on the newly added `backup-and-restore-automation.sh` script and its description added to the table of contents and the appropriate sections:
-
----
-
 # Backup and Restore Automation Scripts
 
 Automate your database backup, upload, download, restoration, and cleanup processes with these shell scripts. Designed for ease of use and efficiency, these scripts help manage your backups stored in Oracle Cloud Infrastructure (OCI) Object Storage.
