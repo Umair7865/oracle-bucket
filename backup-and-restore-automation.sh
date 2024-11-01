@@ -74,7 +74,7 @@ else
 fi
 
 # Archive the folder
-tar -czf $DESTINATION_FOLDER/$ARCHIVE_NAME -C $SOURCE_FOLDER .
+tar -cf $DESTINATION_FOLDER/$ARCHIVE_NAME -C $SOURCE_FOLDER .
 
 echo " "
 echo " Congratulations!!! TAR file of your database has been created under directory $HOME/backup-in-tar"
@@ -83,8 +83,12 @@ echo " "
 
 }
 
+# Declare global variable
+BUCKET_NAME=""
 
-
+set_bucket_name() {
+    read -p "Enter the bucket name: " BUCKET_NAME
+}
 
 
 # Function for upload-to-bucket.sh
@@ -92,8 +96,11 @@ upload_to_bucket() {
 
 # Variables
 # NAMESPACE=$(oci os ns get --query 'data' --raw-output)
-
-BUCKET_NAME="<enter name of bucket>"                                                    # Replace with your bucket name
+# Prompt for bucket name if not already set
+    if [ -z "$BUCKET_NAME" ]; then
+        set_bucket_name
+    fi
+#BUCKET_NAME="<enter name of bucket>"                                                    # Replace with your bucket name
 OBJECT_NAME="latest_database_backup_$(date +\%F__\%H_hour-\%M_min).tar"                 # Name to use when storing the object in the bucket
 FILE_PATH="$HOME/backup-in-tar/backup_mysql.tar.gz"           # Path to the file on your local system
 
@@ -107,6 +114,7 @@ else
     echo "Failed to upload file '$FILE_PATH'."
 fi
 
+echo ""
 }
 
 
@@ -117,29 +125,32 @@ fi
 download_and_restore() {
 # Variables
 NAMESPACE=$(oci os ns get --query 'data' --raw-output)
-BUCKET_NAME="<Bucket-Name-Here>"  # Replace with your bucket name
+#BUCKET_NAME="<Bucket-Name-Here>"  # Replace with your bucket name
 LOCAL_DOWNLOAD_PATH="$HOME/downloads"  # Directory where the tar file will be downloaded
 EXTRACT_PATH="$HOME/downloads"  # Directory where the tar file will be extracted
 MYSQL_USER="root"  # Replace with your MySQL username
 MYSQL_PASSWORD="root123"  # Replace with your MySQL password
 
 # making downloads directory if not exist 
-DOWNLOAD_DIR="$HOME/download"
-
+DOWNLOAD_DIR="$HOME/downloads"
+echo ""
 # Check if the directory exists
 if [ ! -d "$DOWNLOAD_DIR" ]; then
     # If not, create the directory
     mkdir "$DOWNLOAD_DIR"
-    echo "Directory 'download' created at $HOME"
+    echo "Directory 'downloads' created at $HOME"
 else
-    echo "Directory 'download' already exists at $HOME"
+    echo "Directory 'downloads' already exists at $HOME"
 fi
 
+echo ""
 # Prompt for the object file name
 read -p "Enter the object file name to download from the bucket: " OBJECT_NAME
 
 # Download the tar file from OCI Object Storage
 oci os object get --bucket-name "$BUCKET_NAME" --name "$OBJECT_NAME" --file "$LOCAL_DOWNLOAD_PATH/$OBJECT_NAME"
+
+echo "$BUCKET_NAME" 
 
 # Check if the download was successful
 if [ $? -ne 0 ]; then
@@ -185,7 +196,7 @@ for DATABASE_DIR in "$EXTRACT_PATH"/*; do
 done
 
 echo "Database restore process completed."
-
+echo " "
 
 }
 
@@ -204,8 +215,27 @@ delete_all_except_latest() {
 # ATTENTION: This script will delete old backups
 # in the specified Object Storage bucket, keeping
 # ONLY the most recent backup.
-# WARNING: Run with caution.
-…# Loop through and delete all objects except the latest one
+# ============================================
+
+
+# User-configurable variables
+NAMESPACE=$(oci os ns get --query 'data' --raw-output)
+
+# Prompt for confirmation before proceeding
+read -p "WARNING: This action will permanently delete old backups and keep only the latest. Are you sure you want to continue? (yes/no): " confirmation
+
+if [[ "$confirmation" != "yes" ]]; then
+    echo "Action aborted. No objects were deleted."
+    exit 1
+fi
+
+# Find the latest backup object by modification date
+LATEST_OBJECT=$(oci os object list -ns $NAMESPACE -bn $BUCKET_NAME --fields name,timeModified --query 'data | sort_by(@, &"time-modified") | reverse(@) | [0].name' --raw-output | tr -d '"')
+
+echo "Latest backup is: $LATEST_OBJECT"
+
+
+# Loop through and delete all objects except the latest one
 for OBJECT in $(oci os object list -ns $NAMESPACE -bn $BUCKET_NAME --query "data[?name!='$LATEST_OBJECT'].name" --raw-output | tr -d '",' | sed 's/^\[//;s/\]$//')
 do
     echo "Deleting $OBJECT..."
@@ -215,6 +245,11 @@ done
 echo "Deletion complete. Only the latest backup remains."
 
 }
+
+
+
+
+
 
 
 
