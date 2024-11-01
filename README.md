@@ -1,3 +1,7 @@
+Here’s the complete README file with details on the newly added `backup-and-restore-automation.sh` script and its description added to the table of contents and the appropriate sections:
+
+---
+
 # Backup and Restore Automation Scripts
 
 Automate your database backup, upload, download, restoration, and cleanup processes with these shell scripts. Designed for ease of use and efficiency, these scripts help manage your backups stored in Oracle Cloud Infrastructure (OCI) Object Storage.
@@ -9,18 +13,20 @@ Automate your database backup, upload, download, restoration, and cleanup proces
 - [Installation](#installation)
 - [Scripts](#scripts)
   - [backup-in-tar.sh](#backup-in-tarsh)
-  - [upload_to_bucket.sh](#upload_to_bucketsh)
-  - [download_and_restore.sh](#download_and_restoresh)
+  - [upload-to-bucket.sh](#upload-to-bucketsh)
+  - [download-and-restore.sh](#download-and-restoresh)
   - [delete-all-object-except-latest.sh](#delete-all-object-except-latestsh)
+  - [backup-and-restore-automation.sh](#backup-and-restore-automationsh)
 - [Usage](#usage)
 - [Contributing](#contributing)
 
 ## Features
 
-- **Backup Automation**: Create tar archives of your database backups into instance.
+- **Backup Automation**: Create tar archives of your database backups on the instance.
 - **Upload to OCI Bucket**: Upload tar files to OCI Object Storage for secure and centralized storage.
 - **Download & Restore**: Download tar files from OCI Object Storage, extract them, and restore databases.
 - **Cleanup**: Automatically delete older backups, retaining only the latest one.
+- **Unified Script**: One interactive script to perform all operations.
 
 ## Prerequisites
 
@@ -43,7 +49,7 @@ Before using these scripts, ensure you have the following:
 2. **Make Scripts Executable**
 
    ```bash
-   chmod +x backup-in-tar.sh upload_to_bucket.sh download_and_restore.sh delete-all-object-except-latest.sh
+   chmod +x backup-in-tar.sh upload-to-bucket.sh download-and-restore.sh delete-all-object-except-latest.sh backup-and-restore-automation.sh
    ```
 
 ## Scripts
@@ -76,7 +82,7 @@ Automates the backup process by archiving database dumps into tar files.
 
 ---
 
-### `upload_to_bucket.sh`
+### `upload-to-bucket.sh`
 
 Uploads the created tar files to your specified OCI Object Storage bucket, ensuring your backups are securely stored in the cloud.
 
@@ -92,22 +98,18 @@ BUCKET_NAME="<Bucket-Name-Here>"    # Replace with your OCI bucket name within s
 #### Script Functionality
 
 1. **Verify Directory**: Ensures the local tar directory exists; exits if not found.
-2. **List Tar Files**: Identifies all `.tar` files in the directory.
-3. **Upload Files**: Uploads each tar file to the OCI bucket using OCI CLI, confirming each upload.
-4. **Completion Message**: Notifies once all files are successfully uploaded.
-
-
+2. **Upload Files**: Uploads the tar file to the OCI bucket using OCI CLI, confirming the upload.
+3. **Completion Message**: Notifies once the file is successfully uploaded.
 
 #### Run the Script
 
 ```bash
-./upload_to_bucket.sh
+./upload-to-bucket.sh
 ```
 
 ---
 
-
-### `download_and_restore.sh`
+### `download-and-restore.sh`
 
 Downloads a tar file from OCI Object Storage, extracts it, and restores the databases.
 
@@ -148,25 +150,11 @@ MYSQL_PASSWORD="root123"               # Replace with your MySQL password
 
 4. **Restore Databases**
 
-   After extraction, the script automatically restores each database using the SQL files extracted from the tar archive. Here's how it works:
+   After extraction, the script automatically restores each database using the SQL files extracted from the tar archive.
 
-   - **Iterate Through Directories**: The script goes through each folder in the extraction path. Each folder should represent a separate database.
+   - **Identify SQL Files**: The script finds the latest SQL file within each database folder and restores that latest dump to ensure the most up-to-date data is used.
 
-   - **Identify SQL Files**: Inside each database folder, the script looks for a file named `dump.sql`. This file contains the SQL commands needed to restore the database.
-
-   - **Check for Latest Dump**: Additionally, the script identifies the most recent `dump.sql` file within each database folder and restores that latest dump to ensure the most up-to-date data is used.
-
-   - **Restore Process**: Using the MySQL command-line tool, the script imports the `dump.sql` file into the corresponding database. If the restoration is successful, you will see a message like:
-
-     ```
-     Restored database1 successfully.
-     ```
-
-     If the `dump.sql` file is missing, it will notify you:
-
-     ```
-     SQL file not found for database1.
-     ```
+   - **Restore Process**: The script imports the SQL file into the corresponding database, and displays success or failure messages accordingly.
 
    - **Completion Message**: Once all databases have been processed, the script will display:
 
@@ -174,12 +162,10 @@ MYSQL_PASSWORD="root123"               # Replace with your MySQL password
      Database restore process completed.
      ```
 
-   This comprehensive process ensures that all your databases are accurately restored from the latest backups.
-
 #### Run the Script
 
 ```bash
-./download_and_restore.sh
+./download-and-restore.sh
 ```
 
 ---
@@ -200,15 +186,15 @@ BUCKET_NAME="<Bucket-Name-HERE>"    # Replace with your actual bucket name
 
 1. **List Objects in Bucket**
 
-   The script retrieves a list of all objects stored in the specified OCI bucket. This allows the script to know which backups are available.
+   The script retrieves a list of all objects stored in the specified OCI bucket.
 
 2. **Identify Latest Object**
 
-   It determines which object (tar file) is the most recent based on the last modified timestamp. This ensures that the latest backup is retained.
+   It determines the most recent object based on the last modified timestamp, ensuring the latest backup is retained.
 
 3. **Delete Older Objects**
 
-   All objects except the latest one are deleted from the bucket. This helps in managing storage space by removing outdated backups while keeping the most recent one for recovery purposes.
+   All objects except the latest one are deleted from the bucket to manage storage space effectively.
 
 #### Example Output
 
@@ -228,6 +214,31 @@ Deletion complete. Only the latest backup remains.
 
 ---
 
+### `backup-and-restore-automation.sh`
+
+Provides a single interface to perform all backup and restore operations, including archiving, uploading, downloading, restoring, and deleting backups.
+
+#### Functionality
+
+This script combines all individual backup, upload, download, restore, and cleanup operations into one unified script. The user is prompted to select from these options, and the appropriate function is executed based on their choice.
+
+1. **Backup Databases**: Archives MySQL database dumps into a compressed `.tar.gz` file.
+2. **Upload to OCI Bucket**: Uploads the tar file to the specified OCI Object Storage bucket.
+3. **Download and Restore Databases**: Downloads the latest tar file from the OCI bucket, extracts it, and restores the databases.
+4. **Cleanup Old Backups**: Deletes all but the most recent backup file from the OCI bucket.
+
+#### Usage
+
+Run the script and select an option from the menu:
+
+```bash
+./backup-and-restore-automation.sh
+```
+
+This interactive script guides you through each step, making it easier to perform individual operations as needed.
+
+---
+
 ## Usage
 
 1. **Backup Databases**
@@ -240,18 +251,18 @@ Deletion complete. Only the latest backup remains.
 
 2. **Upload to OCI Bucket**
 
-   Use `upload_to_bucket.sh` to upload the tar files to your OCI Object Storage bucket.
+   Use `upload-to-bucket.sh` to upload the tar files to your OCI Object Storage bucket.
 
    ```bash
-   ./upload_to_bucket.sh
+   ./upload-to-bucket.sh
    ```
 
 3. **Download and Restore Databases**
 
-   Use `download_and_restore.sh` to download the latest backup and restore the databases.
+   Use `download-and-restore.sh` to download the latest backup and restore the databases.
 
    ```bash
-   ./download_and_restore.sh
+   ./download-and-restore.sh
    ```
 
 4. **Cleanup Old Backups**
@@ -260,6 +271,14 @@ Deletion complete. Only the latest backup remains.
 
    ```bash
    ./delete-all-object-except-latest.sh
+   ```
+
+5. **Run All Operations via Menu**
+
+   Use `backup-and-restore-automation.sh` to select from all available operations.
+
+   ```bash
+   ./backup-and-restore-automation.sh
    ```
 
 ---
@@ -275,7 +294,9 @@ Contributions are welcome! Please open an issue or submit a pull request for any
    git checkout -b feature/YourFeature
    ```
 
-3. **Commit Your Changes**
+3. **Commit Your
+
+ Changes**
 
    ```bash
    git commit -m "Add your message"
