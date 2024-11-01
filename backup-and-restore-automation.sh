@@ -218,10 +218,7 @@ echo "Deletion complete. Only the latest backup remains."
 
 
 
-
-
-
-
+while true; do
 # Main script to choose which function to execute
 echo " "
 echo " "
@@ -242,3 +239,10 @@ case $choice in
     4) delete_all_except_latest ;;
     *) echo "Invalid choice. Exiting." ;;
 esac
+# Ask if the user wants to perform another operation
+    read -p "Would you like to perform another operation? (yes/no): " again
+    if [[ "$again" != "yes" ]]; then
+        echo "Exiting script. Goodbye!"
+        break
+    fi
+done
